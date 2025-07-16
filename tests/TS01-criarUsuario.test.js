@@ -1,8 +1,9 @@
 const request = require('supertest')
 const {expect} = require('chai')
 
-let email
-before (async() => {
+describe('validar usuario',()=>{
+    let email
+    before (async() => {
         const response = await request('http://localhost:3001')
             .post('/api/auth/register')
             .send({
@@ -21,8 +22,16 @@ before (async() => {
 
 
 })
+    
+    it('validar usuario',async()=>{
+        const response = await request('http://localhost:3001')
+            .get(`/api/auth/status/${email}`)
+        
+        expect(response.status).to.eq(200)
+        expect(response.body.exists).to.eq(true)
 
-module.exports ={
-    getEmail: ()=> email 
+    })
 
-}
+
+
+})
