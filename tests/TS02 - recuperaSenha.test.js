@@ -2,7 +2,7 @@ const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../src/server');
 
-describe('Recuperação de Senha - /api/auth/forgot-password', () => {
+describe('Solicitar Recuperação de senha - /api/auth/forgot-password', () => {
   const baseUrl = '/api/auth';
   const testUser = {
     email: 'reginaldo@exemplo.com',

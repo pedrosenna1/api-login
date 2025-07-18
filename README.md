@@ -45,7 +45,7 @@ Acesse a documentação interativa da API em:
 
 - `POST /api/auth/login` - Realizar login
 - `POST /api/auth/forgot-password` - Solicitar recuperação de senha
-- `POST /api/auth/reset-password` - Redefinir senha
+- `PATCH /api/auth/reset-password` - Redefinir senha (permite dados parciais)
 - `POST /api/auth/unlock-account` - Desbloquear conta
 - `GET /api/auth/status` - Verificar status da conta
 
@@ -72,7 +72,7 @@ curl -X POST http://localhost:3001/api/auth/forgot-password \
 
 #### Redefinir senha:
 ```bash
-curl -X POST http://localhost:3001/api/auth/reset-password \
+curl -X PATCH http://localhost:3001/api/auth/reset-password \
   -H "Content-Type: application/json" \
   -d '{
     "email": "usuario@exemplo.com",
