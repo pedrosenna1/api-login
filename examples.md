@@ -97,7 +97,7 @@ curl -X POST http://localhost:3001/api/auth/forgot-password \
 
 ### 6. Redefinir Senha
 ```bash
-curl -X PATCH http://localhost:3001/api/auth/reset-password \
+curl -X POST http://localhost:3001/api/auth/reset-password \
   -H "Content-Type: application/json" \
   -d '{
     "email": "usuario@exemplo.com",
@@ -176,7 +176,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 
 ### Token de Recuperação Inválido
 ```bash
-curl -X PATCH http://localhost:3001/api/auth/reset-password \
+curl -X POST http://localhost:3001/api/auth/reset-password \
   -H "Content-Type: application/json" \
   -d '{
     "email": "usuario@exemplo.com",

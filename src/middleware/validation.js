@@ -74,66 +74,53 @@ const validateEmail = (req, res, next) => {
 };
 
 /**
- * Valida dados para redefinição de senha (PATCH)
- * Permite atualização parcial dos dados
+ * Valida dados para redefinição de senha
  */
 const validateResetPassword = (req, res, next) => {
   const { email, token, newPassword } = req.body;
 
-  // Para PATCH, pelo menos dois campos devem estar presentes
-  const providedFields = [email, token, newPassword].filter(field => field !== undefined && field !== null && field !== '');
-  
-  if (providedFields.length < 2) {
+  if (!email || !token || !newPassword) {
     return res.status(400).json({
       error: 'Dados inválidos',
-      message: 'Pelo menos dois campos (email, token, newPassword) são obrigatórios'
+      message: 'Email, token e nova senha são obrigatórios'
     });
   }
 
-  // Valida email se fornecido
-  if (email !== undefined && email !== null) {
-    if (typeof email !== 'string' || email.trim() === '') {
-      return res.status(400).json({
-        error: 'Dados inválidos',
-        message: 'Email deve ser uma string não vazia'
-      });
-    }
-
-    // Validação básica de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        error: 'Dados inválidos',
-        message: 'Formato de email inválido'
-      });
-    }
+  if (typeof email !== 'string' || email.trim() === '') {
+    return res.status(400).json({
+      error: 'Dados inválidos',
+      message: 'Email deve ser uma string não vazia'
+    });
   }
 
-  // Valida token se fornecido
-  if (token !== undefined && token !== null) {
-    if (typeof token !== 'string' || token.trim() === '') {
-      return res.status(400).json({
-        error: 'Dados inválidos',
-        message: 'Token deve ser uma string não vazia'
-      });
-    }
+  if (typeof token !== 'string' || token.trim() === '') {
+    return res.status(400).json({
+      error: 'Dados inválidos',
+      message: 'Token deve ser uma string não vazia'
+    });
   }
 
-  // Valida newPassword se fornecido
-  if (newPassword !== undefined && newPassword !== null) {
-    if (typeof newPassword !== 'string' || newPassword.trim() === '') {
-      return res.status(400).json({
-        error: 'Dados inválidos',
-        message: 'Nova senha deve ser uma string não vazia'
-      });
-    }
+  if (typeof newPassword !== 'string' || newPassword.trim() === '') {
+    return res.status(400).json({
+      error: 'Dados inválidos',
+      message: 'Nova senha deve ser uma string não vazia'
+    });
+  }
 
-    if (newPassword.length < 6) {
-      return res.status(400).json({
-        error: 'Dados inválidos',
-        message: 'A senha deve ter pelo menos 6 caracteres'
-      });
-    }
+  if (newPassword.length < 6) {
+    return res.status(400).json({
+      error: 'Dados inválidos',
+      message: 'A senha deve ter pelo menos 6 caracteres'
+    });
+  }
+
+  // Validação básica de email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      error: 'Dados inválidos',
+      message: 'Formato de email inválido'
+    });
   }
 
   next();

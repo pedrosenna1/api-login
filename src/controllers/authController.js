@@ -239,27 +239,16 @@ const forgotPassword = (req, res) => {
 /**
  * @swagger
  * /api/auth/reset-password:
- *   patch:
+ *   post:
  *     summary: Redefinir senha
- *     description: Redefine a senha usando token de recuperação. Permite atualização parcial dos dados.
+ *     description: Redefine a senha usando token de recuperação
  *     tags: [Autenticação]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 description: Email do usuário (opcional se outros campos fornecidos)
- *               token:
- *                 type: string
- *                 description: Token de recuperação (opcional se outros campos fornecidos)
- *               newPassword:
- *                 type: string
- *                 description: Nova senha (opcional se outros campos fornecidos)
+ *             $ref: '#/components/schemas/ResetPasswordRequest'
  *           example:
  *             email: "usuario@exemplo.com"
  *             token: "token_recuperacao"
@@ -292,17 +281,6 @@ const forgotPassword = (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { email, token, newPassword } = req.body;
-    
-    // Para PATCH, validamos que pelo menos dois campos foram fornecidos
-    const providedFields = [email, token, newPassword].filter(field => field !== undefined && field !== null && field !== '');
-    
-    if (providedFields.length < 2) {
-      return res.status(400).json({
-        error: 'Dados inválidos',
-        message: 'Pelo menos dois campos (email, token, newPassword) são obrigatórios'
-      });
-    }
-    
     const result = await authService.resetPassword(email, token, newPassword);
     res.status(200).json(result);
   } catch (error) {

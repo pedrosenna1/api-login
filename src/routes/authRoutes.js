@@ -10,7 +10,7 @@ router.post('/login', validateLogin, authController.login);
 router.post('/forgot-password', validateEmail, authController.forgotPassword);
 
 // Rota para redefinir senha
-router.patch('/reset-password', validateResetPassword, authController.resetPassword);
+router.post('/reset-password', validateResetPassword, authController.resetPassword);
 
 // Rota para desbloquear conta
 router.post('/unlock-account', validateEmail, authController.unlockAccount);
