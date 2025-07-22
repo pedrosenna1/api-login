@@ -48,6 +48,8 @@ Acesse a documentação interativa da API em:
 - `POST /api/auth/reset-password` - Redefinir senha
 - `POST /api/auth/unlock-account` - Desbloquear conta
 - `GET /api/auth/status` - Verificar status da conta
+- `POST /api/auth/register` - Registrar novo usuário
+- `PATCH /api/auth/register/{id}` - Atualizar parcialmente um usuário existente
 
 ### Exemplos de Uso
 
@@ -86,44 +88,12 @@ curl -X POST http://localhost:3001/api/auth/reset-password \
 curl http://localhost:3001/api/auth/status/usuario@exemplo.com
 ```
 
-## Estrutura do Projeto
-
-```
-src/
-├── controllers/     # Controladores da API
-├── routes/         # Rotas da aplicação
-├── services/       # Lógica de negócio
-├── middleware/     # Middlewares customizados
-├── utils/          # Utilitários
-└── server.js       # Arquivo principal do servidor
-```
-
-## Tecnologias Utilizadas
-
-- **Node.js** - Runtime JavaScript
-- **Express** - Framework web
-- **Swagger** - Documentação da API
-- **CORS** - Cross-Origin Resource Sharing
-- **Helmet** - Segurança
-- **Morgan** - Logging de requisições
-- **bcryptjs** - Criptografia de senhas
-- **jsonwebtoken** - Tokens JWT
-
-## Testes
-
-Para executar os testes:
+#### Atualizar parcialmente um usuário (PATCH):
 ```bash
-npm test
+curl -X PATCH http://localhost:3001/api/auth/register/usuario@exemplo.com \
+  -H "Content-Type: application/json" \
+  -d '{
+    "password": "novaSenha123",
+    "name": "Novo Nome"
+  }'
 ```
-
-## Observações
-
-- Esta API é destinada para estudos de autenticação e testes
-- Os dados são armazenados em memória (não há persistência)
-- A comunicação é feita via JSON
-- Senhas são criptografadas com bcrypt
-- Controle de tentativas de login implementado
-- **Não há rotas de carrinho de compras**
-- Seguindo boas práticas de desenvolvimento 
-
- 
