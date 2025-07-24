@@ -514,11 +514,125 @@ const register = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/auth/register/{id}:
+ *   patch:
+ *     summary: Atualizar parcialmente um usuário
+ *     description: Atualiza parcialmente os dados de um usuário existente. O id é obrigatório no path. Os campos do corpo (email, password, name) são opcionais.
+ *     tags: [Autenticação]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID do usuário
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Novo email (opcional)
+ *               password:
+ *                 type: string
+ *                 description: Nova senha (opcional)
+ *               name:
+ *                 type: string
+ *                 description: Novo nome (opcional)
+ *           example:
+ *             email: "usuario@exemplo.com"
+ *             password: "novaSenha123"
+ *             name: "Novo Nome"
+ *     responses:
+ *       200:
+ *         description: Usuário atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     email:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *       400:
+ *         description: Dados inválidos ou nenhum campo para atualizar
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Usuário não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+const registerPatch = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { email, password, name } = req.body;
+    if (!id) {
+      return res.status(400).json({
+        error: 'Dados inválidos',
+        message: 'ID do usuário é obrigatório para atualização'
+      });
+    }
+    const updates = {};
+    if (email) updates.email = email;
+    if (password) updates.password = password;
+    if (name) updates.name = name;
+    const result = await authService.updateUser(id, updates);
+    res.status(200).json(result);
+  } catch (error) {
+    if (error.message.includes('obrigatório')) {
+      res.status(400).json({
+        error: 'Dados inválidos',
+        message: error.message
+      });
+    } else if (error.message.includes('não encontrado')) {
+      res.status(404).json({
+        error: 'Usuário não encontrado',
+        message: error.message
+      });
+    } else if (error.message.includes('Nenhum campo válido')) {
+      res.status(400).json({
+        error: 'Dados inválidos',
+        message: error.message
+      });
+    } else if (error.message.includes('senha deve ter pelo menos')) {
+      res.status(400).json({
+        error: 'Dados inválidos',
+        message: error.message
+      });
+    } else {
+      res.status(500).json({
+        error: 'Erro interno do servidor',
+        message: error.message
+      });
+    }
+  }
+};
+
 module.exports = {
   login,
   forgotPassword,
   resetPassword,
   unlockAccount,
   getAccountStatus,
-  register
+  register,
+  registerPatch
 }; 

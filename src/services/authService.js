@@ -317,6 +317,61 @@ class AuthService {
       }
     };
   }
+
+  /**
+   * Atualiza parcialmente um usuário existente
+   * @param {string} id - ID do usuário (email)
+   * @param {Object} updates - Campos a atualizar (email, password, name)
+   * @returns {Object} Resultado da atualização
+   */
+  async updateUser(id, updates = {}) {
+    if (!id) {
+      throw new Error('ID do usuário é obrigatório para atualização');
+    }
+    const user = this.users.get(id);
+    if (!user) {
+      throw new Error('Usuário não encontrado');
+    }
+    let updated = false;
+    // Atualizar email se fornecido e diferente
+    if (updates.email && updates.email !== id) {
+      if (this.users.has(updates.email)) {
+        throw new Error('Já existe um usuário com este email');
+      }
+      this.users.delete(id);
+      user.email = updates.email;
+      this.users.set(updates.email, user);
+      updated = true;
+    }
+    // Atualizar senha se fornecida
+    if (updates.password) {
+      if (updates.password.length < 6) {
+        throw new Error('A senha deve ter pelo menos 6 caracteres');
+      }
+      user.password = await bcrypt.hash(updates.password, 10);
+      updated = true;
+    }
+    // Atualizar nome se fornecido
+    if (updates.name) {
+      user.name = updates.name;
+      updated = true;
+    }
+    // Se email não foi alterado, garantir que o Map está atualizado
+    if (!updates.email || updates.email === id) {
+      this.users.set(id, user);
+    }
+    if (!updated) {
+      throw new Error('Nenhum campo válido para atualizar');
+    }
+    return {
+      success: true,
+      message: 'Usuário atualizado com sucesso',
+      user: {
+        email: user.email,
+        name: user.name
+      }
+    };
+  }
 }
 
 // Exporta uma instância singleton do serviço

@@ -21,4 +21,7 @@ router.get('/status/:email', authController.getAccountStatus);
 // Rota para registro de usuário
 router.post('/register', validateRegister, authController.register);
 
+// Rota para alteração parcial do registro de usuário (PATCH)
+router.patch('/register/:id', validateRegister, authController.registerPatch);
+
 module.exports = router; 
