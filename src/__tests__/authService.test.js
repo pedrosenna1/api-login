@@ -1,4 +1,7 @@
 const authService = require('../services/authService');
+const request = require('supertest');
+const { expect } = require('chai');
+const app = require('../server');
 
 describe('AuthService', () => {
   beforeEach(async () => {
@@ -235,5 +238,91 @@ describe('AuthService', () => {
       expect(() => authService.verifyToken('token_invalido'))
         .toThrow('Token inválido');
     });
+  });
+});
+
+describe('POST /api/auth/reset-password', () => {
+  let token;
+  const email = 'resetuser@exemplo.com';
+  const password = 'senha123';
+  const newPassword = 'novaSenha123';
+
+  before(async () => {
+    // Cria usuário
+    await request(app)
+      .post('/api/auth/register')
+      .send({ email, password, name: 'Reset User' });
+    // Solicita token de recuperação
+    const res = await request(app)
+      .post('/api/auth/forgot-password')
+      .send({ email });
+    token = res.body.token;
+  });
+
+  it('deve redefinir a senha com sucesso', async () => {
+    const res = await request(app)
+      .post('/api/auth/reset-password')
+      .send({ email, token, newPassword });
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('success', true);
+    expect(res.body).to.have.property('message');
+  });
+
+  it('deve retornar 404 para token inválido', async () => {
+    const res = await request(app)
+      .post('/api/auth/reset-password')
+      .send({ email, token: 'token_invalido', newPassword });
+    expect(res.status).to.equal(404);
+    expect(res.body).to.have.property('error', 'Token inválido');
+  });
+
+  it('deve retornar 400 se faltar campos obrigatórios', async () => {
+    const res = await request(app)
+      .post('/api/auth/reset-password')
+      .send({ email, token });
+    expect(res.status).to.equal(400);
+    expect(res.body).to.have.property('error');
+  });
+
+  it('deve retornar 400 se a senha for muito curta', async () => {
+    const res = await request(app)
+      .post('/api/auth/reset-password')
+      .send({ email, token, newPassword: '123' });
+    expect(res.status).to.equal(400);
+    expect(res.body).to.have.property('error');
+  });
+});
+
+describe('GET /api/auth/status/:email', () => {
+  const email = 'statususer@exemplo.com';
+  const password = 'senha123';
+
+  before(async () => {
+    await request(app)
+      .post('/api/auth/register')
+      .send({ email, password, name: 'Status User' });
+  });
+
+  it('deve retornar status da conta para email existente', async () => {
+    const res = await request(app)
+      .get(`/api/auth/status/${email}`);
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('exists', true);
+    expect(res.body).to.have.property('isLocked');
+    expect(res.body).to.have.property('remainingAttempts');
+  });
+
+  it('deve retornar exists false para email inexistente', async () => {
+    const res = await request(app)
+      .get('/api/auth/status/naoexiste@exemplo.com');
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('exists', false);
+  });
+
+  it('deve retornar 500 para email inválido', async () => {
+    const res = await request(app)
+      .get('/api/auth/status/email_invalido');
+    expect(res.status).to.be.oneOf([400, 500]);
+    expect(res.body).to.have.property('error');
   });
 }); 
