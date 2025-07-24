@@ -407,6 +407,14 @@ const unlockAccount = (req, res) => {
 const getAccountStatus = (req, res) => {
   try {
     const { email } = req.params;
+    // Validação básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        error: 'Email inválido',
+        message: 'Formato de email inválido'
+      });
+    }
     const status = authService.getAccountStatus(email);
     res.status(200).json(status);
   } catch (error) {
